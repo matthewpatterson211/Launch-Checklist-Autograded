@@ -8,13 +8,13 @@ function addDestinationInfo(document, name, diameter, star, distance, moons, ima
 
     missionTarget.innerHTML =` <h2>Mission Destination</h2>
                  <ol>
-                     <li>Name: </li>
-                     <li>Diameter: </li>
+                     <li>Name: ${name}</li>
+                     <li>Diameter: ${diameter}</li>
                      <li>Star: ${star}</li>
-                     <li>Distance from Earth: </li>
-                     <li>Number of Moons: </li>
+                     <li>Distance from Earth: ${distance}</li>
+                     <li>Number of Moons: ${moons}</li>
                  </ol>
-                 <img src="">`
+                 <img src="${imageUrl}">`
     
  }
  
@@ -31,13 +31,10 @@ function addDestinationInfo(document, name, diameter, star, distance, moons, ima
  
  function formSubmission(document,list, pilot, copilot, fuelLevel, cargoLevel) {
     let pilotStatus = document.getElementById("pilotStatus");
- 
     let copilotStatus = document.getElementById("copilotStatus");
-    let faultyItems = document.getElementById("faultyItems");
     let fuelStatus = document.getElementById("fuelStatus");
     let launchStatus = document.getElementById("launchStatus")
     let cargoStatus = document.getElementById("cargoStatus");
-
 
     if(validateInput(pilot) ==='Empty' || validateInput(copilot) === 'Empty' || validateInput(fuelLevel) === 'Empty' || validateInput(cargoLevel) === 'Empty') {
         alert("All fields are required");
@@ -46,38 +43,44 @@ function addDestinationInfo(document, name, diameter, star, distance, moons, ima
     } else if (validateInput(pilot) ==='Is a Number' || validateInput(copilot) ==="Is a Number") {
         alert("Pilot name and Co-Pilot Name cannot be numbers")
     } else {
-        pilotStatus.innerHTML = `Pilot ${pilot} is ready!`;
-        copilotStatus.innerHTML = `Copilot ${copilot} is ready!`;
-
-        if (Number(fuelLevel) < 10000) {
-            faultyItems.style.visibility = "visible";
-            fuelStatus.innerHTML =`Fuel level not high enough`;
-            launchStatus.innerHTML = `Shuttle Not ready for Launch`;
-            launchStatus.style.color = 'red';
-        } else if (Number(cargoLevel > 10000)) {
-            faultyItems.style.visibility = "visible";
-            cargoStatus.innerHTML =`Cargo level is too high`;
-            launchStatus.innerHTML = `Shuttle not Ready for Launch`;
-            launchStatus.style.color = 'red'; 
-        } else {
-            launchStatus.innerHTML = "Shuttle is ready for launch";
-            launchStatus.style.color = 'green';
-        }
+        pilotStatus.innerHTML = `Pilot ${pilot} is ready for launch`;
+        copilotStatus.innerHTML = `Co-pilot ${copilot} is ready for launch`;
     }
 
+    if (Number(fuelLevel) < 10000) {
+            list.style.visibility = "visible";
+            fuelStatus.innerHTML =`Fuel level too low for launch`;
+            launchStatus.innerHTML = `Shuttle Not Ready for Launch`;
+            launchStatus.style.color = 'red';
+    } else if (Number(cargoLevel) > 10000) {
+            list.style.visibility = "visible";
+            cargoStatus.innerHTML =`Cargo mass too heavy for launch`;
+            fuelStatus.innerHTML =`Fuel level high enough for launch`;
+            launchStatus.innerHTML = `Shuttle Not Ready for Launch`;
+            launchStatus.style.color = 'red'; 
+    } else if (Number(cargoLevel) <= 10000 && Number(fuelLevel) >= 10000) {
+            list.style.visibility = "visible";
+            fuelStatus.innerHTML = `Fuel level high enough for launch`;
+            cargoStatus.innerHTML = `Cargo mass low enough for launch`;
+            launchStatus.innerHTML = "Shuttle is Ready for Launch";
+            launchStatus.style.color = 'green';
+    }
+}
 
- }
+
+
  
  async function myFetch() {
-     let planetsReturned;
- 
-     planetsReturned = await fetch("https://handlers.education.launchcode.org/static/planets.json").then( function(response) {
-         });
+     let planetsReturned = await fetch("https://handlers.education.launchcode.org/static/planets.json").then( function(response) {
+        return response.json()     
+    });
  
      return planetsReturned;
  }
  
  function pickPlanet(planets) {
+    let index = Math.floor(Math.random() * planets.length);
+    return planets[index];
  }
  
  module.exports.addDestinationInfo = addDestinationInfo;
